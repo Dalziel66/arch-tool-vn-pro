@@ -1,0 +1,4 @@
+artifacts/
+dist/
+*.user
+.DS_Store
