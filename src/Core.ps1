@@ -137,8 +137,16 @@ function Get-MocExitDescription {
         '0x00000000' { return 'Hoàn tất (exit 0).' }
         '0x00000BC2' { return 'Hoàn tất; cần khởi động lại. Mộc không tự khởi động lại.' }
         '0x8A15002B' { return 'Không có bản cập nhật phù hợp.' }
+        '0x8A150061' { return 'Đã cài sẵn; bỏ qua (không cài đè). Dùng "Cập nhật" nếu muốn lên bản mới.' }
         default { return "Không hoàn tất. Exit $Code ($hex). Xem đầu ra bên dưới." }
     }
+}
+
+# [VI] True nếu exit code nghĩa là "không có gì để làm": hàng đợi chạy tiếp, không tính là lỗi.
+# Cố ý không gồm 3010 (cần reboot) và mã lạ: vẫn dừng để người dùng xem lại.
+function Test-MocExitBenign {
+    param([int]$Code)
+    return $Code -in @(0, -1978335189, -1978335135)  # 0, 0x8A15002B (no update), 0x8A150061 (already installed)
 }
 
 # [VI] Trả về đường dẫn EXE ở vị trí cài đặt chuẩn của ứng dụng, hoặc $null nếu không tìm thấy.

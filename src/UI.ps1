@@ -246,7 +246,9 @@ function Start-MocWindow {
     param([switch]$SmokeTest,[string]$ScreenshotPath)
     $script:Catalog=@(Get-MocCatalog); $script:Selected=@{}; $script:Category='Tất cả'; $script:Busy=$false; $script:Running=$null; $script:Maintenance=$null
     # Single instance per session prevents two windows racing on tweak snapshots.
-    $script:Mutex=New-Object Threading.Mutex($false,'Local\MocToolkit-Desktop-v1')
+    # Smoke test không ghi registry/bản sao, nên dùng khóa riêng để chạy được khi người dùng đang mở Mộc.
+    $mutexName=if ($SmokeTest) {'Local\MocToolkit-Smoke-v1'} else {'Local\MocToolkit-Desktop-v1'}
+    $script:Mutex=New-Object Threading.Mutex($false,$mutexName)
     if (-not $script:Mutex.WaitOne(0)) { $script:Mutex.Dispose(); throw 'Mộc đang mở. Hãy dùng cửa sổ hiện tại.' }
     try {
         $xml=[xml](Get-Content -LiteralPath (Join-Path $PSScriptRoot 'MainWindow.xaml') -Raw -Encoding UTF8)
@@ -306,7 +308,7 @@ function Start-MocWindow {
                 Add-MocLog (Get-MocExitDescription -Code $code)
                 Write-MocAudit -Event 'process-exit' -Detail @{id=$job.Plan.Id; action=$job.Plan.Action; code=$code}
                 $script:Completed++
-                if ($code -ne 0) { $script:Failures++; $script:Queue.Clear(); Add-MocLog 'Đã dừng các mục tiếp theo để bạn kiểm tra kết quả trước.' }
+                if (-not (Test-MocExitBenign -Code $code)) { $script:Failures++; $script:Queue.Clear(); Add-MocLog 'Đã dừng các mục tiếp theo để bạn kiểm tra kết quả trước.' }
                 $job.Process.Dispose(); $script:Running=$null
                 Start-MocNext
             } catch {
