@@ -5,6 +5,7 @@
 - Sửa: hàng đợi không còn kẹt "đang chạy" khi winget đã thoát nhưng tiến trình con (ứng dụng tự mở sau khi cài) còn giữ pipe đầu ra; chờ 5 giây rồi chạy tiếp, bỏ phần đầu ra.
 - `install.ps1`: cài lại khi Mộc đang mở báo rõ "đóng Mộc rồi chạy lại" thay vì lỗi Move-Item thô.
 - Giải thích mã 0x8A150014 (winget không tìm thấy gói); hàng đợi vẫn dừng.
+- Giao diện: khung trạng thái + nhật ký chuyển sang cột trái, các tab chức năng nằm bên phải; cửa sổ mặc định 1320 px, tối thiểu 1180 px.
 - Dọn: bỏ brush `Accent` và tham chiếu `AppsScroll` không dùng; `Build.ps1` dùng một biến `$version`.
 - README: lệnh `irm` là cách cài chính; thêm cách mở lại Mộc. USER-GUIDE: sửa mô tả mã thoát đã lỗi thời.
 - 2 test mới (53): mã 0x8A150014, và `install.ps1` vẫn parse được khi irm giải mã Latin-1.
