@@ -136,6 +136,7 @@ function Get-MocExitDescription {
     switch ($hex) {
         '0x00000000' { return 'Hoàn tất (exit 0).' }
         '0x00000BC2' { return 'Hoàn tất; cần khởi động lại. Mộc không tự khởi động lại.' }
+        '0x8A150014' { return 'Winget không tìm thấy gói: chưa cài (khi cập nhật/gỡ) hoặc mã gói không còn trên nguồn.' }
         '0x8A15002B' { return 'Không có bản cập nhật phù hợp.' }
         '0x8A150061' { return 'Đã cài sẵn; bỏ qua (không cài đè). Dùng "Cập nhật" nếu muốn lên bản mới.' }
         default { return "Không hoàn tất. Exit $Code ($hex). Xem đầu ra bên dưới." }

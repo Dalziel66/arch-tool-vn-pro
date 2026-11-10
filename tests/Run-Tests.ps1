@@ -43,6 +43,11 @@ Assert-True ($null -eq (Get-MocLaunchPath -Id 'Unknown.Package')) 'No PATH fallb
 Assert-True ((Get-MocExitDescription 3010) -match 'khởi động lại') 'Reboot-required exit is explained'
 Assert-True ((Get-MocExitDescription -1) -match '0xFFFFFFFF') 'Negative HRESULT is preserved as unsigned hex'
 Assert-True ((Get-MocExitDescription -1978335135) -match 'Đã cài sẵn') 'Already-installed (0x8A150061) is explained'
+Assert-True ((Get-MocExitDescription -1978335212) -match 'không tìm thấy gói') 'Package-not-found (0x8A150014) is explained'
+# irm (PS 5.1) giải mã install.ps1 bằng Latin-1 khi máy chủ không gửi charset: script vẫn phải parse được.
+$parseIssues=$null; $parseTokens=$null
+[void][Management.Automation.Language.Parser]::ParseInput([Text.Encoding]::GetEncoding(28591).GetString([IO.File]::ReadAllBytes("$root\scripts\Install.template.ps1")),[ref]$parseTokens,[ref]$parseIssues)
+Assert-True ($parseIssues.Count -eq 0) 'Install script still parses when irm decodes it as Latin-1'
 Assert-True ((Test-MocExitBenign 0) -and (Test-MocExitBenign -1978335135) -and (Test-MocExitBenign -1978335189)) 'Success/already-installed/no-update keep the queue running'
 Assert-True (-not (Test-MocExitBenign 3010) -and -not (Test-MocExitBenign 1) -and -not (Test-MocExitBenign -1)) 'Reboot-required and unknown codes still stop the queue'
 $official='{"Name":"winget","Arg":"https://cdn.winget.microsoft.com/cache","Type":"Microsoft.PreIndexed.Package","Identifier":"Microsoft.Winget.Source_8wekyb3d8bbwe"}'

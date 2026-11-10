@@ -1,16 +1,17 @@
 ﻿#requires -Version 5.1
 # [VI] Đóng gói portable: chép các thư mục được liệt kê, biên dịch Moc.exe bằng csc của .NET Framework, tạo SHA256SUMS và ZIP.
 [CmdletBinding()]
-# [VI] -Repo owner/name: sinh thêm dist/install.ps1 cho lệnh irm, trỏ tới GitHub Release v0.1.0.
+# [VI] -Repo owner/name: sinh thêm dist/install.ps1 cho lệnh irm, trỏ tới GitHub Release của $version.
 param([ValidatePattern('^[A-Za-z0-9-]+/[A-Za-z0-9._-]+$')][string]$Repo='')
 $ErrorActionPreference='Stop'
 Set-StrictMode -Version Latest
 $root=Split-Path $PSScriptRoot -Parent
-$published=Join-Path $root 'dist\MocToolkit-0.1.0'
+$version='0.1.0'
+$published=Join-Path $root "dist\MocToolkit-$version"
 # Always stage into a fresh directory. Never zip a previously run portable folder,
 # which may contain logs, test artifacts or files removed from newer source.
 $stageRoot=Join-Path $root ('dist\.build-' + [Guid]::NewGuid().ToString('N'))
-$destination=Join-Path $stageRoot 'MocToolkit-0.1.0'
+$destination=Join-Path $stageRoot "MocToolkit-$version"
 $compiler=Join-Path $env:SystemRoot 'Microsoft.NET\Framework64\v4.0.30319\csc.exe'
 if (-not (Test-Path -LiteralPath $compiler)) { throw 'The Windows .NET Framework C# compiler was not found.' }
 [void](New-Item -ItemType Directory -Path $destination -Force)
@@ -25,7 +26,7 @@ $hashes=Get-ChildItem -LiteralPath $destination -File -Recurse | Where-Object Na
     (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant() + '  ' + $_.FullName.Substring($destination.Length+1)
 }
 [IO.File]::WriteAllLines($manifest,[string[]]$hashes,(New-Object Text.UTF8Encoding($false)))
-$zip=Join-Path $root 'dist\MocToolkit-0.1.0.zip'
+$zip=Join-Path $root "dist\MocToolkit-$version.zip"
 Compress-Archive -LiteralPath $destination -DestinationPath $zip -Force
 [void](New-Item -ItemType Directory -Path $published -Force)
 Get-ChildItem -LiteralPath $destination -Force | ForEach-Object { Copy-Item -LiteralPath $_.FullName -Destination $published -Recurse -Force }
@@ -36,7 +37,7 @@ $zipHash=(Get-FileHash -LiteralPath $zip -Algorithm SHA256).Hash
 if ($Repo) {
     # Hash cố định trong install.ps1: zip bị thay trên release sẽ bị từ chối.
     $template=[IO.File]::ReadAllText((Join-Path $root 'scripts\Install.template.ps1')).TrimStart([char]0xFEFF)
-    $call="[void](Install-Moc -ZipUrl 'https://github.com/$Repo/releases/download/v0.1.0/MocToolkit-0.1.0.zip' -Sha256 '$zipHash' -Version '0.1.0')"
+    $call="[void](Install-Moc -ZipUrl 'https://github.com/$Repo/releases/download/v$version/MocToolkit-$version.zip' -Sha256 '$zipHash' -Version '$version')"
     if ($template -notmatch '#MOC-INVOKE') { throw 'Install template marker missing.' }
     $installer=Join-Path $root 'dist\install.ps1'
     # Không BOM: irm có thể giải mã BOM thành ký tự lạ ở đầu script.

@@ -38,7 +38,10 @@ function Install-Moc {
         $target = Join-Path $Destination $Version
         [void](New-Item -ItemType Directory -Path $Destination -Force)
         $old = $null
-        if (Test-Path -LiteralPath $target) { $old = "$target.old-" + [Guid]::NewGuid().ToString('N'); Move-Item -LiteralPath $target -Destination $old }
+        if (Test-Path -LiteralPath $target) { $old = "$target.old-" + [Guid]::NewGuid().ToString('N')
+            # Mộc đang mở giữ thư mục này làm thư mục làm việc nên không đổi tên được.
+            try { Move-Item -LiteralPath $target -Destination $old } catch { throw "Khong thay duoc ban cu (Moc dang mo?). Dong Moc roi chay lai lenh. $($_.Exception.Message)" }
+        }
         try { Move-Item -LiteralPath $source -Destination $target }
         catch { if ($old) { Move-Item -LiteralPath $old -Destination $target }; throw }
         if ($old) { Remove-Item -LiteralPath $old -Recurse -Force -ErrorAction SilentlyContinue }

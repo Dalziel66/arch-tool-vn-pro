@@ -255,7 +255,7 @@ function Start-MocWindow {
         $reader=New-Object Xml.XmlNodeReader $xml
         $script:Window=[Windows.Markup.XamlReader]::Load($reader)
         $script:Ui=@{}
-        foreach ($name in @('WingetBadge','ThemeButton','Tabs','SearchBox','SearchHint','DevPreset','BasicPreset','ClearSelection','Categories','AppCards','AppsScroll','SelectionLabel','InstallButton','UpgradeButton','UninstallButton','InventoryButton','TweakCards','ToolCards','DocsButton','LogsButton','StatusText','CopyLogButton','StopButton','LogBox','Footer')) { $script:Ui[$name]=$script:Window.FindName($name) }
+        foreach ($name in @('WingetBadge','ThemeButton','Tabs','SearchBox','SearchHint','DevPreset','BasicPreset','ClearSelection','Categories','AppCards','SelectionLabel','InstallButton','UpgradeButton','UninstallButton','InventoryButton','TweakCards','ToolCards','DocsButton','LogsButton','StatusText','CopyLogButton','StopButton','LogBox','Footer')) { $script:Ui[$name]=$script:Window.FindName($name) }
         $script:Ui.Footer.Text="v0.1.0   /   $([Environment]::OSVersion.Version.Major).$([Environment]::OSVersion.Version.Build)   /   LOCAL SESSION"
         foreach ($category in @('Tất cả') + @($script:Catalog.category | Select-Object -Unique)) {
             $cat=$category
@@ -299,9 +299,15 @@ function Start-MocWindow {
                 $job=$script:Running
                 $seconds=[int]((Get-Date)-$job.Started).TotalSeconds
                 $script:Ui.StatusText.Text="●  ĐANG CHẠY / $($job.Plan.Id) · ${seconds}s · $($script:Queue.Count) mục chờ"
-                if (-not $job.Process.HasExited -or -not $job.Output.IsCompleted -or -not $job.Error.IsCompleted) { return }
+                if (-not $job.Process.HasExited) { return }
+                # Installer con (ví dụ app tự mở sau khi cài) có thể giữ pipe mở sau khi winget thoát:
+                # chờ tối đa 5 giây rồi bỏ phần đầu ra, thay vì kẹt "đang chạy" mãi.
+                $drained=$job.Output.IsCompleted -and $job.Error.IsCompleted
+                if (-not $drained -and ((Get-Date)-$job.Process.ExitTime).TotalSeconds -lt 5) { return }
                 $code=$job.Process.ExitCode
-                $output=$job.Output.GetAwaiter().GetResult(); $err=$job.Error.GetAwaiter().GetResult()
+                $output=''; $err=''
+                if ($drained) { $output=$job.Output.GetAwaiter().GetResult(); $err=$job.Error.GetAwaiter().GetResult() }
+                else { Add-MocLog 'Winget đã thoát nhưng tiến trình con còn giữ đầu ra; bỏ qua phần đầu ra.' }
                 # Remove ANSI control sequences and spinner backspaces for a readable log.
                 $output=[regex]::Replace($output, '\x1B\[[0-?]*[ -/]*[@-~]', '') -replace "`b",''
                 if ($output) { Add-MocLog $output.Trim() }; if ($err) { Add-MocLog $err.Trim() }

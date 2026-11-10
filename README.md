@@ -10,9 +10,7 @@ Mình làm Mộc theo một nguyên tắc: **không có gì chạy khi bạn ch�
 
 ## Cài và chạy
 
-### Cách 1: một dòng lệnh (khuyên dùng)
-
-Mở **CMD** hoặc **PowerShell** bằng tài khoản thường (không cần "Run as administrator") rồi dán:
+Mộc được cài và chạy bằng **một dòng lệnh**. Mở **CMD** (hoặc PowerShell) bằng tài khoản thường, không cần "Run as administrator", rồi dán:
 
 ```bat
 powershell -NoProfile -Command "[Net.ServicePointManager]::SecurityProtocol=3072; irm https://github.com/Dalziel66/arch-tool-vn-pro/releases/latest/download/install.ps1 | iex"
@@ -26,13 +24,19 @@ Lệnh này sẽ:
 4. Giải nén vào `%LOCALAPPDATA%\MocToolkit\app\0.1.0`, không cần quyền quản trị.
 5. Mở Mộc.
 
-Muốn cài lại hoặc sửa bản bị hỏng, cứ chạy lại đúng lệnh đó. Nhật ký và bản sao tinh chỉnh của bạn không bị xóa.
+**Mở lại Mộc lần sau:** chạy lại đúng lệnh trên (luôn lấy bản mới nhất), hoặc mở `%LOCALAPPDATA%\MocToolkit\app\0.1.0\Moc.exe`.
+
+Lệnh đó cũng dùng để cài lại hoặc sửa bản bị hỏng; hãy đóng Mộc trước khi chạy lại. Nhật ký và bản sao tinh chỉnh của bạn không bị xóa.
+
+**Cài phần mềm:** trong tab Ứng dụng, tick các phần mềm (hoặc bấm "Bộ cơ bản" / "Bộ lập trình"), bấm **Cài đặt**, đọc lệnh winget hiện ra, tick đồng ý rồi **Xác nhận & chạy**. Gói đã có sẵn trên máy được bỏ qua, các gói còn lại vẫn cài tiếp.
 
 > Đoạn `SecurityProtocol=3072` bật TLS 1.2. Thiếu nó, một số máy Windows 10 cũ sẽ bị GitHub từ chối kết nối.
 >
 > `irm | iex` nghĩa là bạn tin tài khoản GitHub chứa release này. Mã SHA256 bảo vệ file zip, nhưng không bảo vệ chính `install.ps1`. Muốn chắc chắn thì mở link `install.ps1` ra đọc trước, nó chỉ khoảng 60 dòng.
 
-### Cách 2: tải thủ công
+### Cách khác (không dùng `irm`)
+
+Tải thủ công:
 
 1. Vào [Releases](https://github.com/Dalziel66/arch-tool-vn-pro/releases), tải `MocToolkit-0.1.0.zip`.
 2. Giải nén ra bất kỳ đâu.
@@ -40,7 +44,7 @@ Muốn cài lại hoặc sửa bản bị hỏng, cứ chạy lại đúng lện
 
 File tải từ Internet và chưa ký số nên Windows có thể hỏi lại hoặc chặn. Cách xử lý an toàn có trong [USER-GUIDE](docs/USER-GUIDE.md). **Đừng tắt SmartScreen hay Defender** chỉ để chạy Mộc.
 
-### Cách 3: từ mã nguồn
+Hoặc chạy từ mã nguồn:
 
 ```bat
 git clone https://github.com/Dalziel66/arch-tool-vn-pro.git
@@ -105,9 +109,11 @@ Muốn gỡ Mộc: hoàn tác các tinh chỉnh trước (nếu cần), rồi x�
 | Lỗi | Cách xử lý |
 | --- | --- |
 | `The request was aborted: The connection was closed unexpectedly` | Lệnh thiếu đoạn `SecurityProtocol=3072`, hoặc URL release sai. Chép lại đúng lệnh ở trên |
+| `Khong thay duoc ban cu (Moc dang mo?)` | Đóng cửa sổ Mộc đang mở rồi chạy lại lệnh `irm` |
 | `SHA256 khong khop` | File zip trên release khác với bản mà `install.ps1` mong đợi. Đừng chạy tiếp; báo lại cho người phát hành |
 | `Chưa có App Installer` | Cài hoặc cập nhật **App Installer** từ Microsoft Store rồi mở lại Mộc |
 | `running scripts is disabled` | Mở bằng `Moc.exe` hoặc `Start-Moc.cmd`; chúng chỉ đặt `RemoteSigned` cho riêng tiến trình Mộc, không đổi thiết lập máy |
+| Hàng đợi dừng giữa chừng | Một gói trả về lỗi (hoặc cần khởi động lại). Đọc ô nhật ký phía dưới, xử lý gói đó rồi bấm Cài đặt lại; gói đã cài sẽ được bỏ qua |
 | `Mộc đang mở` | Mộc chỉ cho phép một cửa sổ, để hai cửa sổ không cùng sửa bản sao tinh chỉnh |
 
 Thêm các trường hợp khác trong [USER-GUIDE.md](docs/USER-GUIDE.md).

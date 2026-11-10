@@ -18,7 +18,7 @@ Mộc không ép silent install. Danh sách cập nhật chỉ gồm gói bạn 
 
 Output winget xuất hiện sau khi tác vụ kết thúc. Trong lúc chạy, UI hiện package, thời gian và số mục chờ. “Dừng hàng đợi” bỏ các mục chưa chạy; không hủy installer hiện tại. Nếu installer treo hoặc đợi UAC, xử lý cửa sổ installer; không buộc tắt Mộc trong Task Manager trừ khi chấp nhận nguy cơ cài dở.
 
-Exit khác 0 dừng hàng đợi. “Không có bản cập nhật” hoặc “cần reboot” cũng dừng để xem lại; không xem các mục còn lại là đã hoàn tất. Sao chép nhật ký nếu cần giữ toàn bộ output; audit trên đĩa chỉ lưu sự kiện/lệnh/exit.
+Exit khác 0 dừng hàng đợi, trừ “đã cài sẵn” và “không có bản cập nhật”: hai trường hợp này được ghi lại rồi chạy tiếp. “Cần reboot” và mã lạ vẫn dừng để xem lại; không xem các mục còn lại là đã hoàn tất. Nếu winget đã thoát mà ứng dụng vừa cài còn giữ đầu ra, Mộc chờ 5 giây rồi chạy tiếp và không hiện phần đầu ra đó. Sao chép nhật ký nếu cần giữ toàn bộ output; audit trên đĩa chỉ lưu sự kiện/lệnh/exit.
 
 “Xem máy đã cài gì” hiển thị output nguyên văn từ winget. Không suy diễn cài đặt từ nút Mở: nút này chỉ nhận biết một số vị trí chuẩn; tệp còn phải có chữ ký hợp lệ mới được mở.
 

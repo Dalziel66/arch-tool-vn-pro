@@ -44,3 +44,10 @@ Không phải phần việc đã hoàn thành: đăng ký chính Mộc lên wing
 - Ghi chú `[VI]` cho toàn bộ mã. Đã chạy lại `Test.ps1 -IncludeUI`, `Build.ps1`, `Verify-Catalog.ps1` trên Windows PowerShell 5.1.
 - Khi Python 3.15 lên winget (`Python.Python.3.15`), đổi ID trong `data/apps.json` và chạy lại Verify-Catalog.
 - Bootstrap irm: xem README. Đã thử đầu cuối từ CMD qua file:// + smoke test bản đã cài; chưa thử với GitHub Release thật. Thông báo trong install.ps1 không dấu vì irm có thể giải mã sai UTF-8.
+
+## Cập nhật 10/11/2026 (Claude Code)
+
+- Rà soát toàn bộ mã; chi tiết trong CHANGELOG. Sửa kẹt hàng đợi khi tiến trình con giữ pipe (đã tái hiện mẫu lỗi bằng `cmd /c start /b ping`; chưa thử với installer thật).
+- Đã đối chiếu release v0.1.0: SHA256 trong `install.ps1` khớp digest của zip; `Get-FileHash`/`Expand-Archive` chạy được cả khi ExecutionPolicy là Restricted.
+- Sau khi đổi mã phải build lại và tải **cả hai** file lên release thì người dùng lệnh `irm` mới nhận được bản sửa.
+- Vẫn chưa chạy installer thật; cửa sổ SFC/DISM tự đóng khi xong nên kết quả chỉ xem được trong CBS.log/DISM.log.
